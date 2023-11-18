@@ -94,6 +94,14 @@ position = Vector2(864, 353)
 [node name="Coin3" parent="Coins" instance=ExtResource("3_nht2m")]
 position = Vector2(1024, 416)
 
+[node name="Coin4" parent="Coins" instance=ExtResource("3_nht2m")]
+position = Vector2(1818, 379)
+rotation = 1.74825
+
+[node name="Coin5" parent="Coins" instance=ExtResource("3_nht2m")]
+position = Vector2(1858, 332)
+rotation = -1.32552
+
 [node name="GameManager" type="Node2D" parent="."]
 script = ExtResource("4_ndpt4")
 
