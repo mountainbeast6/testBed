@@ -99,6 +99,12 @@ position = Vector2(712, 353)
 [node name="Coin3" parent="Coins" instance=ExtResource("3_rrh80")]
 position = Vector2(844, 408)
 
+[node name="Coin4" parent="Coins" instance=ExtResource("3_rrh80")]
+position = Vector2(1660, 339)
+
+[node name="Coin5" parent="Coins" instance=ExtResource("3_rrh80")]
+position = Vector2(1662, 263)
+
 [node name="Level" type="Node2D" parent="."]
 
 [node name="Ground" type="TileMap" parent="Level" groups=["Ground"]]
