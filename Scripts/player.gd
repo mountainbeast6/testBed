@@ -23,19 +23,19 @@ var is_grounded : bool = false
 
 func _process(_delta):
 	# Calling functions
-	movement()
+	movement(_delta)
 	player_animations()
 	flip_player()
 	
 # --------- CUSTOM FUNCTIONS ---------- #
 
 # <-- Player Movement Code -->
-func movement():
+func movement(_delta):
 	# Gravity
 	if !is_on_floor():
-		velocity.y += gravity
+		velocity.y += gravity * _delta * 60
 	elif is_on_floor():
-		jump_count = max_jump_count
+		jump_count = max_jump_count 
 	
 	handle_jumping()
 	
