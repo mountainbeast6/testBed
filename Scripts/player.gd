@@ -33,12 +33,18 @@ func _process(_delta):
 func movement(_delta):
 	# Gravity
 	if !is_on_floor():
-		velocity.y += gravity * _delta * 60
+		if !is_on_wall()||!Input.is_action_pressed("Wall Grab"):
+			velocity.y += gravity * _delta * 60
+		else:
+			velocity.y==0
+			velocity.x==0
 	elif is_on_floor():
 		jump_count = max_jump_count 
 	
 	handle_jumping()
-	
+	#wall slide/grab
+
+		
 	# Move Player
 	var inputAxis = Input.get_axis("Left", "Right")
 	if Input.is_action_pressed("Sprint"):
