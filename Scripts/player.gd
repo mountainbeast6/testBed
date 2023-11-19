@@ -1,7 +1,5 @@
 extends CharacterBody2D
-
 # --------- VARIABLES ---------- #
-
 @export_category("Player Properties") # You can tweak these changes according to your likings
 @export var move_speed : float = 400
 @export var jump_force : float = 600
@@ -10,36 +8,51 @@ extends CharacterBody2D
 var jump_count : int = 2
 
 @export_category("Toggle Functions") # Double jump feature is disable by default (Can be toggled from inspector)
-@export var double_jump : = false
+@export var double_jump : = true
 
 var is_grounded : bool = false
 
+var walled : int =0
+var walling : bool =false
+var sliding : bool =false
 @onready var player_sprite = $AnimatedSprite2D
 @onready var spawn_point = %SpawnPoint
 @onready var particle_trails = $ParticleTrails
 @onready var death_particles = $DeathParticles
-
 # --------- BUILT-IN FUNCTIONS ---------- #
-
 func _process(_delta):
 	# Calling functions
 	movement(_delta)
 	player_animations()
-	pause()
 	flip_player()
 	
 # --------- CUSTOM FUNCTIONS ---------- #
-
 # <-- Player Movement Code -->
 func movement(_delta):
 	# Gravity
 	if !is_on_floor():
-		velocity.y += gravity * _delta * 60
+		if is_on_wall() and (walling or walled==0) and Input.is_action_pressed("Wall Grab")and !sliding:
+			velocity.y =0
+			walling =true
+			sliding = false
+			walled=60
+			jump_count = max_jump_count
+		elif is_on_wall()&& Input.is_action_pressed("Wall Grab"):
+			velocity.y += gravity/14 * _delta * 60
+			sliding=true
+		else:
+			velocity.y += gravity * _delta * 60
+			walling= false;
+			sliding=false
 	elif is_on_floor():
 		jump_count = max_jump_count 
-	
+
 	handle_jumping()
-	
+	if(walled!=0):
+		walled-=1
+	#wall slide/grab
+
+
 	# Move Player
 	var inputAxis = Input.get_axis("Left", "Right")
 	if Input.is_action_pressed("Sprint"):
@@ -47,7 +60,6 @@ func movement(_delta):
 	else:
 		velocity = Vector2(inputAxis * move_speed, velocity.y)
 	move_and_slide()
-
 # Handles jumping functionality (double jump or single jump, can be toggled from inspector)
 func handle_jumping():
 	if Input.is_action_just_pressed("Jump"):
@@ -55,9 +67,9 @@ func handle_jumping():
 			jump()
 		elif double_jump and jump_count > 0:
 			jump()
+		if jump_count>0:
+			jump();
 			jump_count -= 1
-
-# Player jump
 func jump():
 	jump_tween()
 	AudioManager.jump_sfx.play()
@@ -119,3 +131,5 @@ func _on_collision_body_entered(_body):
 		AudioManager.death_sfx.play()
 		death_particles.emitting = true
 		death_tween()
+	if _body.is_in_group("Checkpoint"):
+		jump()
