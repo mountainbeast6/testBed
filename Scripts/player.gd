@@ -10,12 +10,10 @@ extends CharacterBody2D
 var jump_count : int = 2
 
 @export_category("Toggle Functions") # Double jump feature is disable by default (Can be toggled from inspector)
-@export var double_jump : = true
+@export var double_jump : = false
 
 var is_grounded : bool = false
-var walled : int =0
-var walling : bool =false
-var sliding : bool =false
+
 @onready var player_sprite = $AnimatedSprite2D
 @onready var spawn_point = %SpawnPoint
 @onready var particle_trails = $ParticleTrails
@@ -27,6 +25,7 @@ func _process(_delta):
 	# Calling functions
 	movement(_delta)
 	player_animations()
+	pause()
 	flip_player()
 	
 # --------- CUSTOM FUNCTIONS ---------- #
@@ -35,27 +34,12 @@ func _process(_delta):
 func movement(_delta):
 	# Gravity
 	if !is_on_floor():
-		if is_on_wall() and (walling or walled==0) and Input.is_action_pressed("Wall Grab")and !sliding:
-			velocity.y =0
-			walling =true
-			sliding = false
-			walled=60
-			jump_count = max_jump_count
-		elif is_on_wall()&& Input.is_action_pressed("Wall Grab"):
-			velocity.y += gravity/14 * _delta * 60
-			sliding=true
-		else:
-			velocity.y += gravity * _delta * 60
-			walling= false;
-			sliding=false
+		velocity.y += gravity * _delta * 60
 	elif is_on_floor():
 		jump_count = max_jump_count 
+	
 	handle_jumping()
-	if(walled!=0):
-		walled-=1
-	#wall slide/grab
-
-		
+	
 	# Move Player
 	var inputAxis = Input.get_axis("Left", "Right")
 	if Input.is_action_pressed("Sprint"):
@@ -67,9 +51,12 @@ func movement(_delta):
 # Handles jumping functionality (double jump or single jump, can be toggled from inspector)
 func handle_jumping():
 	if Input.is_action_just_pressed("Jump"):
-		if jump_count>0:
-			jump();
+		if is_on_floor() and !double_jump:
+			jump()
+		elif double_jump and jump_count > 0:
+			jump()
 			jump_count -= 1
+
 # Player jump
 func jump():
 	jump_tween()
@@ -95,6 +82,14 @@ func flip_player():
 		player_sprite.flip_h = true
 	elif velocity.x > 0:
 		player_sprite.flip_h = false
+		
+
+func pause():
+	if Input.is_action_just_pressed("Pause"):
+		get_tree().paused = !get_tree().paused
+		print(get_tree().paused)
+	#else:
+		#get_tree().paused = true
 
 # Tween Animations
 func death_tween():
